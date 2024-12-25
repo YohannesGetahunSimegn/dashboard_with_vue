@@ -186,10 +186,4 @@ input {
 button {
   font-size: 1rem;
 }
-
-p {
-  font-size: 1.2rem;
-  color: #007bff;
-  margin-top: 10px;
-}
 </style>
