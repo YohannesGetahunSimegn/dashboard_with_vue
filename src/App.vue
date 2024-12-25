@@ -2,18 +2,33 @@
   <div class="app">
     <header>
       <h1>Simple Dashboard</h1>
-      <p>Welcome to your dashboard! Here's a quick overview of your data.</p>
+      <p>Your can add and remove a user here!</p>
     </header>
 
     <main class="main-content">
-      <div class="calendar-container">
-        <h2>Upcoming Events</h2>
-        <CalendarView :events="events" />
+      <div class="remove-user-container">
+        <h2>Remove User</h2>
+        <div>
+          <input
+            v-model="userIdToRemove"
+            type="number"
+            placeholder="Enter user ID to remove"
+          />
+          <Button
+            @click="handleRemoveUser"
+            :disabled="!userIdToRemove"
+            type="danger"
+          >
+            Remove User
+          </Button>
+        </div>
       </div>
 
       <div class="data-table-container">
         <h2>User Data</h2>
-        <!-- Updated DataTable with proper props -->
+        <Button @click="handleAddRow" :disabled="false" type="primary">
+          Add Random User
+        </Button>
         <DataTable
           :columns="columns"
           :rows="rows"
@@ -26,14 +41,11 @@
 </template>
 
 <script setup>
-import { CalendarView, DataTable } from "@swarmakit/vue";
+import { ref } from "vue";
+import { DataTable, Button } from "@swarmakit/vue";
+import "@swarmakit/vue/dist/style.css"; // Import Swarmakit's global styles
 
-const events = [
-  { date: "2024-12-25", title: "Christmas Celebration" },
-  { date: "2024-12-31", title: "New Year's Eve Party" },
-];
-
-// DataTable props
+// User data for the table
 const columns = [
   { key: "id", label: "ID", sortable: true },
   { key: "name", label: "Name", sortable: true },
@@ -41,19 +53,35 @@ const columns = [
   { key: "role", label: "Role", sortable: false },
 ];
 
-const rows = [
+const rows = ref([
   { id: 1, name: "John Doe", email: "john.doe@example.com", role: "Admin" },
   { id: 2, name: "Jane Smith", email: "jane.smith@example.com", role: "User" },
-  {
-    id: 3,
-    name: "Alice Johnson",
-    email: "alice.johnson@example.com",
-    role: "Moderator",
-  },
-];
+]);
 
-const handleActionClick = () => {
-  alert("Action performed!");
+// User ID to remove from the table
+const userIdToRemove = ref(null);
+
+// Function to add a random user to the data table
+const handleAddRow = () => {
+  const newRow = {
+    id: rows.value.length + 1,
+    name: "Random User",
+    email: `user${rows.value.length + 1}@example.com`,
+    role: "Guest",
+  };
+  rows.value.push(newRow);
+};
+
+// Function to remove a user by ID
+const handleRemoveUser = () => {
+  const userId = userIdToRemove.value;
+  const index = rows.value.findIndex((user) => user.id === userId);
+  if (index !== -1) {
+    rows.value.splice(index, 1);
+    userIdToRemove.value = null; // Reset input after removal
+  } else {
+    alert("User not found");
+  }
 };
 </script>
 
@@ -83,36 +111,31 @@ header p {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  margin-bottom: 30px;
 }
 
-.main-content > div {
+.remove-user-container,
+.data-table-container {
   background: white;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
-  font-size: 1.6rem;
-  margin-bottom: 15px;
+input {
+  padding: 8px;
+  font-size: 1rem;
+  margin-right: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
-footer {
-  text-align: center;
-  margin-top: 30px;
+button {
+  font-size: 1rem;
 }
 
-footer .swarm-button {
-  background-color: #4caf50;
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-footer .swarm-button:hover {
-  background-color: #45a049;
+p {
+  font-size: 1.2rem;
+  color: #007bff;
+  margin-top: 10px;
 }
 </style>
